@@ -1,4 +1,25 @@
+# 仿Kazumi的原生鸿蒙开发
+
+鸿蒙开发版本及其API版本
+
+注：该项目只做学习，不商用
+
+| API版本 | ohos版本 |
+| ------- | -------- |
+| 19      | 5.1.1    |
+
+
+
+---
+
+
+
+##  以下是在学习过程中对知识的记录
+
+
+
 # Navigation页面跳转
+
 [Navigation文档](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-navigation-navigation)
 
 ## 第一步：编写子页面（待跳转页面）
@@ -111,7 +132,6 @@ struct Index {
     "deviceTypes": [
       "phone"
     ],
-  	// ....
 }
 ```
 
