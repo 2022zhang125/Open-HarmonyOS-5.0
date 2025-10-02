@@ -1,0 +1,19 @@
+{
+  "routerMap": [
+    {
+      "name": "First",
+      "pageSourceFile": "src/main/ets/pages/First.ets",
+      "buildFunction": "FirstBuild"
+    },
+    {
+      "name": "Second",
+      "pageSourceFile": "src/main/ets/pages/Home.ets",
+      "buildFunction": "SecondBuild"
+    },
+    {
+      "name": "AnimationDetail",
+      "pageSourceFile": "src/main/ets/pages/AnimationDetail.ets",
+      "buildFunction": "AnimationDetailBuild"
+    }
+  ]
+}
