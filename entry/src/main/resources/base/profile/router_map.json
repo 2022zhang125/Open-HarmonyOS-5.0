@@ -6,7 +6,7 @@
       "buildFunction": "FirstBuild"
     },
     {
-      "name": "Second",
+      "name": "Home",
       "pageSourceFile": "src/main/ets/pages/Home.ets",
       "buildFunction": "SecondBuild"
     },

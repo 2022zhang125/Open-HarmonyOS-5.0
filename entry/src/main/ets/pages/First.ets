@@ -25,7 +25,7 @@ struct First {
   jumpToSecond = (): void => {
     console.info("正在消除Interval定时器...")
     clearInterval(this.stopNum)
-    this.pathStack.replacePathByName("Second", null, false)
+    this.pathStack.replacePathByName("Home", null, false)
   }
 
   build() {

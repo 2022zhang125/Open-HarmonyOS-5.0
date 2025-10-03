@@ -2,7 +2,7 @@ import { Recommend } from "../views/Recommend";
 
 @Builder
 export function SecondBuild() {
-  Second();
+  Home();
 }
 /**
  * 菜单名，菜单默认icon，菜单被选中icon
@@ -15,7 +15,7 @@ interface tabBarsInterfaces {
 
 
 @Component
-struct Second {
+struct Home {
   @State currentIndex:number = 0
   @Provide('pathStack') pathStack:NavPathStack = new NavPathStack()
   tabBars: Array<tabBarsInterfaces> = [
