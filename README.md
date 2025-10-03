@@ -136,6 +136,23 @@ export async function enterImmersion(windowClass: window.Window) {
 
 ### 网络请求
 
+在此之前记得在模拟器中开启网络权限
+
+```json
+{
+  "module": {
+    // 添加获取网络的权限
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+    // ...
+}
+```
+
+
+
 #### 第一步：发送请求(GET请求)
 
 > 封装默认GET请求函数
