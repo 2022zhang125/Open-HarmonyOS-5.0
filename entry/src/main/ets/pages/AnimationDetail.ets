@@ -22,7 +22,7 @@ export interface Collection {
 interface Images {
   common: string,
   grid: string,
-  large: string,
+  large: string | Resource,
   medium: string,
   small: string
 }
@@ -447,7 +447,7 @@ struct AnimationDetail {
                   // 背景虚化图
                   Column() {
                     //  images.large
-                    Image(this.animationInfo.images.large)
+                    Image(typeof this.animationInfo.images.large === 'string' ? this.animationInfo.images.large : "")
                       .width('100%')
                       .height('100%')
                       .objectFit(ImageFit.Cover)
@@ -614,6 +614,9 @@ struct AnimationDetail {
       this.animationItemParm = content.pathInfo.param as AnimationItem;
       await getAnimationItemInfo(this.animationItemParm.id).then(res => {
         this.animationInfo = res;
+        if (this.animationInfo.images.large == "") {
+          this.animationInfo.images.large = $r('app.media.defaultImage')
+        }
       });
       this.isLoading = false;
     })

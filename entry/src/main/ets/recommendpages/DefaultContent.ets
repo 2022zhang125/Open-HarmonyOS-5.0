@@ -5,7 +5,7 @@ import { HttpRequestGet } from "../utils/HttpUtil";
 export interface AnimationItem {
   id:number;
   title: string;
-  image: string;
+  image: string | Resource;
 }
 export interface AImageInterface {
   large: string;

@@ -1,13 +1,13 @@
 import { AnimationItem } from '../recommendpages/DefaultContent'
 
 @Component
-export struct AnimationUnitSkeleton{
+export struct AnimationUnitSkeleton {
   @Prop animationItem: AnimationItem;
   @State opacityValue: number = 0.5;
   @State imageLoaded: boolean = false;
   @State imageError: boolean = false;
-  @State defaultImage:Resource = $r("app.media.defaultImage")
-  @Consume('pathStack') pathStack?:NavPathStack
+  @State defaultImage: Resource = $r("app.media.defaultImage")
+  @Consume('pathStack') pathStack?: NavPathStack
 
   onImageLoad() {
     this.imageLoaded = true;
@@ -20,32 +20,26 @@ export struct AnimationUnitSkeleton{
   }
 
   build() {
-    GridCol({span: 1}){
-      Column(){
+    GridCol({ span: 1 }) {
+      Column() {
         Stack() {
-          Image(this.defaultImage)
-            .width('100%')
-            .height(180)
-            .borderRadius(15)
-            .objectFit(ImageFit.Cover)
-
-          Image(this.animationItem.image)
+          Image(this.animationItem.image != "" ? this.animationItem.image : this.defaultImage)
             .width('100%')
             .height(180)
             .borderRadius(15)
             .objectFit(ImageFit.Cover)
             .visibility(this.imageLoaded && !this.imageError ? Visibility.Visible : Visibility.Hidden)
-            .onComplete(()=>{
+            .onComplete(() => {
               this.onImageLoad()
             })
-            .onError(()=>{
+            .onError(() => {
               this.onImageError()
             })
             // 跳转至详情页面
-            .onClick(()=>{
+            .onClick(() => {
               console.info("页面被点击...")
               // 处理点击事件 跳转详情页
-              this.pathStack?.pushPathByName("AnimationDetail",this.animationItem,false)
+              this.pathStack?.pushPathByName("AnimationDetail", this.animationItem, false)
             })
         }
         .width('100%')
@@ -58,7 +52,7 @@ export struct AnimationUnitSkeleton{
           .fontWeight(FontWeight.Bold)
           .height(40)
           .maxLines(2)
-          .textOverflow({overflow: TextOverflow.Ellipsis})
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .alignItems(HorizontalAlign.Start)
       .justifyContent(FlexAlign.Start)
