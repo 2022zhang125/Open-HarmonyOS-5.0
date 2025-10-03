@@ -11,7 +11,7 @@ export function AnimationDetailBuild() {
   AnimationDetail()
 }
 
-interface Collection {
+export interface Collection {
   collect: number,
   doing: number,
   dropped: number,
@@ -27,19 +27,19 @@ interface Images {
   small: string
 }
 
-interface InfoBox {
+export interface InfoBox {
   key: string,
   value: string | Array<string>
 }
 
-interface Rating {
+export interface Rating {
   count: Record<number, number>,
   rank: number,
   score: number,
   total: number
 }
 
-interface Tag {
+export interface Tag {
   name: string,
   count: number,
   total_cont: number

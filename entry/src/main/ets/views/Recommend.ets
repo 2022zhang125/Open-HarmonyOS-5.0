@@ -9,6 +9,7 @@ export struct Recommend {
     ['日常', '原创', '校园', '搞笑', '奇幻', '百合', '恋爱', '悬疑', '热血', '后宫', '机战', '轻改', '偶像'
       , '治愈', '异世界'];
   @State isClicked: boolean = false
+  @Consume('pathStack') pathStack?: NavPathStack
 
   @Builder
   topBuilder(title: string, index: number) {
@@ -46,13 +47,14 @@ export struct Recommend {
         Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
           Stack() {
             AvatarUtil({ src: $r("app.media.logo"), avatarSize: 60 }).margin(8)
-            // Button('', { type: ButtonType.Circle, stateEffect: false })
-            //   .width(53).height(53).backgroundImage($r("app.media.logo"))
-            //   .backgroundImageSize({ width: 53, height: 53 })
           }
 
-          // 搜索
-          Image($r('app.media.search')).width(30).height(30).margin(12)
+          Button({ type: ButtonType.Circle, stateEffect: false }) {
+            // 搜索
+            AvatarUtil({ src: $r("app.media.search"), avatarSize: 30 }).margin(8)
+          }.backgroundColor("#F8FBF2").onClick(() => {
+            this.pathStack?.pushPathByName("Search", null, false)
+          })
         }
         .width("100%")
         .margin({ top: px2vp(this.topHeight) })

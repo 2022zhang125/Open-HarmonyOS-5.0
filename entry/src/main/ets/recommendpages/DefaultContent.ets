@@ -7,7 +7,7 @@ export interface AnimationItem {
   title: string;
   image: string;
 }
-interface ImageInterface {
+export interface AImageInterface {
   large: string;
   common: string;
   medium: string;
@@ -28,7 +28,7 @@ interface Subject {
   rating: Rating;
   locked: boolean;
   nsfw: boolean;
-  images: ImageInterface;
+  images: AImageInterface;
 }
 interface data{
   subject: Subject;

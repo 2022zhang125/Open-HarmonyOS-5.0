@@ -14,6 +14,11 @@
       "name": "AnimationDetail",
       "pageSourceFile": "src/main/ets/pages/AnimationDetail.ets",
       "buildFunction": "AnimationDetailBuild"
+    },
+    {
+      "name": "Search",
+      "pageSourceFile": "src/main/ets/views/Search.ets",
+      "buildFunction": "SearchBuild"
     }
   ]
 }

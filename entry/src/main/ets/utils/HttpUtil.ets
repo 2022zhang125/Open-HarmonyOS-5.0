@@ -6,7 +6,13 @@ import { AnimationDetailResponse } from "../pages/AnimationDetail";
 import { AnimationCommentsResponse } from "../pages/details/TuCao";
 import { Character } from "../pages/details/Role";
 import { AnimationMarkerResponse } from "../pages/details/Marker";
+import { SearchDataResponse } from "../views/Search";
 
+/**
+ * GET请求
+ * @param url 请求地址
+ * @returns 返回Response
+ */
 function getRequest(url: string): Promise<http.HttpResponse> {
   const httpRequest = http.createHttp();
   return httpRequest.request(url, {
@@ -18,6 +24,26 @@ function getRequest(url: string): Promise<http.HttpResponse> {
     connectTimeout: 3000,
     extraData: {}
   });
+}
+
+/**
+ * POST请求
+ * @param url POST请求地址
+ * @param requestData 请求体数据
+ * @returns 通常HttpResponse对象
+ */
+function postRequest(url: string, requestData: object): Promise<http.HttpResponse> {
+  const httpRequest = http.createHttp()
+  return httpRequest.request(url, {
+    method: http.RequestMethod.POST,
+    readTimeout: 5000,
+    header: {
+      'Content-Type': 'application/json'
+    },
+    connectTimeout: 3000,
+    // 转为JSON
+    extraData: JSON.stringify(requestData)
+  })
 }
 
 function ParseResponseData<T extends AnimationResponse>(httpResult: http.HttpResponse): T {
@@ -110,6 +136,26 @@ export async function getAnimationMarkers(id: number): Promise<AnimationMarkerRe
   const url = Const.ANIMATION_COMMENT_SERVER_URL + id + "/staffs/persons"
   try {
     let res: http.HttpResponse = await getRequest(url)
+    return ParseResponseData(res)
+  } catch (error) {
+    console.info("请求失败:", JSON.stringify(error))
+    throw new Error(error)
+  }
+}
+
+/**
+ * POST请求 获取动画信息，通过Search信息
+ * @requestMethod POST
+ * @param body 请求体
+ * @param limit 界限
+ * @param offset 开始下标
+ * @returns SearchDataResponse数据
+ */
+export async function getAnimationItemBySearch(body: object, limit: number,
+  offset: number): Promise<SearchDataResponse> {
+  const url = Const.API_BGM_TV_SERVER_URL + `/search/subjects?limit=${limit}&offset=${offset}`
+  try {
+    let res: http.HttpResponse = await postRequest(url, body)
     return ParseResponseData(res)
   } catch (error) {
     console.info("请求失败:", JSON.stringify(error))
