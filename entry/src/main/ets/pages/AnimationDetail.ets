@@ -5,6 +5,11 @@ import { LengthMetrics } from "@kit.ArkUI"
 import { Comment, TuCao } from "./details/TuCao"
 import { Role } from "./details/Role"
 import { Marker } from "./details/Marker"
+import common from "@ohos.app.ability.common"
+import Want from "@ohos.app.ability.Want"
+import { webview } from "@kit.ArkWeb"
+import { util } from "@kit.ArkTS"
+import { WebComponent } from "../common/WebComponent"
 
 @Builder
 export function AnimationDetailBuild() {
@@ -93,6 +98,9 @@ struct AnimationDetail {
   @State offsetComment: number = 0;
   @State limitComment: number = 20;
   @State moreComments: Array<Comment> = [];
+  // 页面切换
+  @State changePage: boolean = false;
+  @State url: string = ""
 
   updateIndicator(index: number): void {
     let x: number;
@@ -328,7 +336,7 @@ struct AnimationDetail {
             })
             .onClick(() => {
               if (this.currentIndex !== index) {
-                this.resetScrollState(); // 非吸顶 Tab 切换时重置
+                this.resetScrollState();
                 this.updateIndicator(index)
                 this.currentIndex = index;
               }
@@ -386,8 +394,7 @@ struct AnimationDetail {
     .zIndex(2)
   }
 
-  @
-  Builder
+  @Builder
   TitleHeader() {
     Row() {
       Row() {
@@ -419,6 +426,11 @@ struct AnimationDetail {
           .width(23)
           .height(23)
           .margin({ right: 20 })
+          .onClick(() => {
+            // 点击跳转外部页面
+            this.url = "https://bangumi.tv/subject/" + this.animationItemParm.id
+            this.changePage = true
+          })
       }
       .margin({ top: 20, right: 10 })
       .justifyContent(FlexAlign.SpaceBetween)
@@ -435,174 +447,178 @@ struct AnimationDetail {
       if (this.isLoading) {
         Loading()
       } else {
-        Stack() {
-          this.TitleHeader()
-          // 开始观看按钮
-          this.StartWatching()
-          // 主内容
-          Scroll(this.scroller) {
-            Column() {
+        if (this.changePage) {
+          WebComponent({ url: this.url })
+        } else {
+          Stack() {
+            this.TitleHeader()
+            // 开始观看按钮
+            this.StartWatching()
+            // 主内容
+            Scroll(this.scroller) {
               Column() {
-                Stack({ alignContent: Alignment.TopStart }) {
-                  // 背景虚化图
-                  Column() {
-                    //  images.large
-                    Image(typeof this.animationInfo.images.large === 'string' ? this.animationInfo.images.large : "")
-                      .width('100%')
-                      .height('100%')
-                      .objectFit(ImageFit.Cover)
-                      .opacity(this.opacitySum)
-                      .blur(50)
-                      .borderRadius("2%")
-                  }
-                  .height(this.TOP_IMAGE_HEIGHT)
+                Column() {
+                  Stack({ alignContent: Alignment.TopStart }) {
+                    // 背景虚化图
+                    Column() {
+                      //  images.large
+                      Image(typeof this.animationInfo.images.large === 'string' ? this.animationInfo.images.large : "")
+                        .width('100%')
+                        .height('100%')
+                        .objectFit(ImageFit.Cover)
+                        .opacity(this.opacitySum)
+                        .blur(50)
+                        .borderRadius("2%")
+                    }
+                    .height(this.TOP_IMAGE_HEIGHT)
 
-                  // 详细信息
-                  Column() {
+                    // 详细信息
                     Column() {
                       Column() {
-                        Text(this.animationInfo.name_cn)
-                          .width('100%')
-                          .height(60)
-                          .letterSpacing(2)
-                          .align(Alignment.End)
-                          .font({ size: 25 })
-                      }.justifyContent(FlexAlign.End)
-
-                      Row() {
-                        // images.large
-                        Image(this.animationInfo.images.large)
-                          .width(160)
-                          .height(230)
-                          .borderRadius(15)
-                          .objectFit(ImageFit.Cover)
-                        // 右侧信息区域
                         Column() {
-                          Text("放送开始:")
-                            .fontSize(15)
-                            .fontColor(Color.Black)
+                          Text(this.animationInfo.name_cn)
+                            .width('100%')
+                            .height(60)
+                            .letterSpacing(2)
+                            .align(Alignment.End)
+                            .font({ size: 25 })
+                        }.justifyContent(FlexAlign.End)
 
-                          // date
-                          Text(this.animationInfo.date)
-                            .fontSize(20)
-                            .fontColor("#42733C")
-                            .fontWeight(FontWeight.Bold)
-                            .margin({ top: 6 })
+                        Row() {
+                          // images.large
+                          Image(this.animationInfo.images.large)
+                            .width(160)
+                            .height(230)
+                            .borderRadius(15)
+                            .objectFit(ImageFit.Cover)
+                          // 右侧信息区域
+                          Column() {
+                            Text("放送开始:")
+                              .fontSize(15)
+                              .fontColor(Color.Black)
 
-                          // rating.total
-                          Text(`${this.animationInfo.rating.total}人评分:`)
-                            .fontSize(15)
-                            .fontColor(Color.Black)
-                            .margin({ top: 12 })
-
-                          // rating.score
-                          Row() {
-                            Text(this.animationInfo.rating.score.toString())
+                            // date
+                            Text(this.animationInfo.date)
                               .fontSize(20)
                               .fontColor("#42733C")
                               .fontWeight(FontWeight.Bold)
+                              .margin({ top: 6 })
+
+                            // rating.total
+                            Text(`${this.animationInfo.rating.total}人评分:`)
+                              .fontSize(15)
+                              .fontColor(Color.Black)
+                              .margin({ top: 12 })
 
                             // rating.score
-                            Rating({ rating: this.animationInfo.rating.score / 2, indicator: true })
-                              .stepSize(0.1) // 步长
-                              .height(25)
-                              .width(140)
-                              .margin({ left: 15 })
-                          }
-                          .margin({ top: 6 })
+                            Row() {
+                              Text(this.animationInfo.rating.score.toString())
+                                .fontSize(20)
+                                .fontColor("#42733C")
+                                .fontWeight(FontWeight.Bold)
 
-                          Text("Bangumi Ranked:")
-                            .fontSize(15)
-                            .fontColor(Color.Black)
-                            .margin({ top: 12 })
-
-                          // rating.rank
-                          Text(`#${this.animationInfo.rating.rank}`)
-                            .fontSize(20)
-                            .fontColor("#42733C")
-                            .fontWeight(FontWeight.Bold)
+                              // rating.score
+                              Rating({ rating: this.animationInfo.rating.score / 2, indicator: true })
+                                .stepSize(0.1) // 步长
+                                .height(25)
+                                .width(140)
+                                .margin({ left: 15 })
+                            }
                             .margin({ top: 6 })
-                          Blank()
-                            .layoutWeight(1)
-                          Row({ space: 10 }) {
-                            Image($r('app.media.heart'))
-                              .width(20)
-                              .height(20)
-                            Text("未追")
-                              .fontColor(Color.White)
+
+                            Text("Bangumi Ranked:")
+                              .fontSize(15)
+                              .fontColor(Color.Black)
+                              .margin({ top: 12 })
+
+                            // rating.rank
+                            Text(`#${this.animationInfo.rating.rank}`)
+                              .fontSize(20)
+                              .fontColor("#42733C")
+                              .fontWeight(FontWeight.Bold)
+                              .margin({ top: 6 })
+                            Blank()
+                              .layoutWeight(1)
+                            Row({ space: 10 }) {
+                              Image($r('app.media.heart'))
+                                .width(20)
+                                .height(20)
+                              Text("未追")
+                                .fontColor(Color.White)
+                            }
+                            .alignItems(VerticalAlign.Center)
+                            .justifyContent(FlexAlign.Center)
+                            .width(126)
+                            .height(45)
+                            .backgroundColor("#296A34")
+                            .borderRadius(40)
                           }
-                          .alignItems(VerticalAlign.Center)
-                          .justifyContent(FlexAlign.Center)
-                          .width(126)
-                          .height(45)
-                          .backgroundColor("#296A34")
-                          .borderRadius(40)
+                          .layoutWeight(1)
+                          .margin({ left: 15 })
+                          .width(150)
+                          .height(230)
+                          .alignItems(HorizontalAlign.Start)
                         }
-                        .layoutWeight(1)
-                        .margin({ left: 15 })
-                        .width(150)
-                        .height(230)
-                        .alignItems(HorizontalAlign.Start)
-                      }
-                      .width('100%')
-                      .borderRadius(8)
-                      .margin({ bottom: 20, top: 10 })
-                    }.margin({ top: 97 }).padding({ left: 10 })
-                  }.backdropBlur(100).height('140%').width("100%")
-                }
-                .height('47%').width("100%")
-                .margin({ bottom: 20 })
-                .opacity(this.opacitySum ? this.opacitySum : 1)
-              }
-
-              Column() {
-                // Header
-                this.Header('', "#F6FAF0")
-                Column() {
-                  if (this.currentIndex === 0) {
-                    this.OverView()
-                  } else if (this.currentIndex === 1) {
-                    this.TuCao()
-                  } else if (this.currentIndex === 2) {
-                    this.Role()
-                  } else if (this.currentIndex === 3) {
-                    this.Comment()
-                  } else if (this.currentIndex === 4) {
-                    this.Marker()
+                        .width('100%')
+                        .borderRadius(8)
+                        .margin({ bottom: 20, top: 10 })
+                      }.margin({ top: 97 }).padding({ left: 10 })
+                    }.backdropBlur(100).height('140%').width("100%")
                   }
+                  .height('47%').width("100%")
+                  .margin({ bottom: 20 })
+                  .opacity(this.opacitySum ? this.opacitySum : 1)
                 }
-                .width('100%')
-                .margin({ top: 15 })
+
+                Column() {
+                  // Header
+                  this.Header('', "#F6FAF0")
+                  Column() {
+                    if (this.currentIndex === 0) {
+                      this.OverView()
+                    } else if (this.currentIndex === 1) {
+                      this.TuCao()
+                    } else if (this.currentIndex === 2) {
+                      this.Role()
+                    } else if (this.currentIndex === 3) {
+                      this.Comment()
+                    } else if (this.currentIndex === 4) {
+                      this.Marker()
+                    }
+                  }
+                  .width('100%')
+                  .margin({ top: 15 })
+                }
               }
+              .width('100%')
             }
-            .width('100%')
-          }
-          .scrollBar(BarState.Off)
-          .scrollable(ScrollDirection.Vertical)
-          .onScrollEdge(async () => {
-            if (this.currentIndex === 1) {
-              this.offsetComment += 20
-              // 发送请求获取更多数据
-              await getAnimationComments(this.animationItemParm?.id, this.offsetComment, this.limitComment)
-                .then(res => {
-                  this.moreComments = res.data as Array<Comment>
-                })
+            .scrollBar(BarState.Off)
+            .scrollable(ScrollDirection.Vertical)
+            .onScrollEdge(async () => {
+              if (this.currentIndex === 1) {
+                this.offsetComment += 20
+                // 发送请求获取更多数据
+                await getAnimationComments(this.animationItemParm?.id, this.offsetComment, this.limitComment)
+                  .then(res => {
+                    this.moreComments = res.data as Array<Comment>
+                  })
+              }
+            })
+            .onWillScroll((xOffset: number, yOffset: number, scrollState: ScrollState, scrollSource: ScrollSource) => {
+              this.yOffsetSum += yOffset
+
+              let newOpacity = 1 - (this.yOffsetSum / this.SCROLL_THRESHOLD)
+              this.opacitySum = Math.max(0.1, Math.min(1.0, newOpacity));
+
+              this.isSticky = this.yOffsetSum >= 295;
+
+              return { xOffset, yOffset }
+            })
+
+            // 吸顶 Header
+            if (this.isSticky) {
+              this.HeaderComponent(155, "#EBEFE5", true)
             }
-          })
-          .onWillScroll((xOffset: number, yOffset: number, scrollState: ScrollState, scrollSource: ScrollSource) => {
-            this.yOffsetSum += yOffset
-
-            let newOpacity = 1 - (this.yOffsetSum / this.SCROLL_THRESHOLD)
-            this.opacitySum = Math.max(0.1, Math.min(1.0, newOpacity));
-
-            this.isSticky = this.yOffsetSum >= 295;
-
-            return { xOffset, yOffset }
-          })
-
-          // 吸顶 Header
-          if (this.isSticky) {
-            this.HeaderComponent(155, "#EBEFE5", true)
           }
         }
       }
