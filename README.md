@@ -147,7 +147,7 @@ export async function enterImmersion(windowClass: window.Window) {
       {
         "name": "ohos.permission.INTERNET"
       }
-    ],
+    ]
     // ...
 }
 ```
