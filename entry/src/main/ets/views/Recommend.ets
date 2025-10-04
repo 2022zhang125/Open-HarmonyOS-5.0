@@ -1,5 +1,6 @@
 import { AvatarUtil } from "../common/AvatarUtil";
 import { DefaultContent } from "../recommendpages/DefaultContent";
+import { GeneralContent } from "../recommendpages/GeneralContent";
 
 @Component
   // 推荐页面
@@ -10,6 +11,7 @@ export struct Recommend {
       , '治愈', '异世界'];
   @State isClicked: boolean = false
   @Consume('pathStack') pathStack?: NavPathStack
+  scroll: Scroller = new Scroller()
 
   @Builder
   topBuilder(title: string, index: number) {
@@ -32,17 +34,13 @@ export struct Recommend {
     }
   }
 
-  @Builder
-  tabContent(title: string) {
-    Text(title)
-  }
-
   @StorageLink("topHeight") topHeight: number = 0
   @StorageLink("bottomHeight") bottomHeight: number = 0
 
   build() {
     Column() {
       Column() {
+
         // 左边头像 右边搜索
         Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
           Stack() {
@@ -67,9 +65,27 @@ export struct Recommend {
             TabContent() {
               // 默认状态
               if (this.topIndex === index) {
-                this.tabContent(item)
+                GeneralContent({ title: item, index: this.topIndex })
               } else {
-                DefaultContent()
+                Column() {
+                  Image($r('app.media.top'))
+                    .width(60)
+                    .height(60)
+                    .backgroundColor("#AEF2AF")
+                    .zIndex(2)
+                    .padding(15)
+                    .borderRadius(20)
+                    .position({ x: '80%', y: '72%' })
+                    .onClick(() => {
+                      this.scroll
+                        .scrollTo({
+                          xOffset: 0, yOffset: 0, animation: {
+                            duration: 300
+                          }
+                        })
+                    })
+                  DefaultContent({ scroll: this.scroll })
+                }
               }
             }
             .tabBar(this.topBuilder(item, index))

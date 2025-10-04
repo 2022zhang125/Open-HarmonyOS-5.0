@@ -1,12 +1,14 @@
 import { http } from "@kit.NetworkKit";
 import { Const } from "../common/Const";
-import { AnimationResponse, AnimeRecommendResponse } from "../recommendpages/DefaultContent"; // 需要导入 AnimeResponse 类型
+import {
+  AnimationItem, AnimationResponse, AnimeRecommendResponse
+} from "../recommendpages/DefaultContent"; // 需要导入 AnimeResponse 类型
 import { JSON } from "@kit.ArkTS";
 import { AnimationDetailResponse } from "../pages/AnimationDetail";
 import { AnimationCommentsResponse } from "../pages/details/TuCao";
 import { Character } from "../pages/details/Role";
 import { AnimationMarkerResponse } from "../pages/details/Marker";
-import { SearchDataResponse } from "../views/Search";
+import { Body, SearchDataResponse } from "../views/Search";
 
 /**
  * GET请求
@@ -44,6 +46,74 @@ function postRequest(url: string, requestData: object): Promise<http.HttpRespons
     // 转为JSON
     extraData: JSON.stringify(requestData)
   })
+}
+
+/**
+ * POST请求体构建
+ * @param keyword 关键词
+ * @param sort 排序方式
+ * @param tag 标签
+ * @param rank 等级
+ * @returns POST请求体对象
+ */
+export function BuildBody(keyword: string, sort: string, tag: Array<string>, rank: number) {
+  const body: Body = {
+    "keyword": `${keyword}`,
+    // heat,rank
+    "sort": `${sort}`,
+    "filter": {
+      "type": [
+        2
+      ],
+      "tag": tag,
+      "rank": [
+        `>=${rank}`,
+        "<=99999"
+      ],
+      "nsfw": false
+    }
+  }
+  return body
+}
+
+/**
+ * 生成 20 - 10000的随机数，用于每次点击tab时的数据展示
+ * @returns 随机数
+ */
+export function getRank(): number {
+  return Math.floor(Math.random() * (10000 - 20 + 1)) + 20;
+}
+
+/**
+ * 将AnimeRecommendResponse对象转为AnimationItem对象
+ *
+ * @param response AnimeRecommendResponse对象
+ * @returns AnimationItem[] 数组
+ */
+export function transformToAnimations(response: AnimeRecommendResponse): AnimationItem[] {
+  const result: Array<AnimationItem> = []
+  for (let index = 0; index < response.data.length; index++) {
+    const element = response.data[index];
+    result.push({
+      id: element.subject.id,
+      title: element.subject.nameCN,
+      image: element.subject.images.large
+    })
+  }
+  return result;
+}
+
+export function transformSearchDataResponseToAnimations(response: SearchDataResponse,
+  animations: AnimationItem[]): AnimationItem[] {
+  response.data.forEach(item => {
+    const animation: AnimationItem = {
+      id: item.id,
+      title: item.name_cn ? item.name_cn : item.name,
+      image: item.image
+    }
+    animations.push(animation)
+  })
+  return animations
 }
 
 function ParseResponseData<T extends AnimationResponse>(httpResult: http.HttpResponse): T {

@@ -2,7 +2,7 @@ import { AnimationUnitSkeleton } from "../common/AnimationUnitSkeleton"
 import { AvatarUtil } from "../common/AvatarUtil"
 import { InfoBox, Tag, Rating, Collection } from "../pages/AnimationDetail";
 import { AImageInterface, AnimationItem, AnimationResponse } from "../recommendpages/DefaultContent"
-import { getAnimationItemBySearch } from "../utils/HttpUtil";
+import { BuildBody, getAnimationItemBySearch, transformSearchDataResponseToAnimations } from "../utils/HttpUtil";
 import { Loading } from "../common/Loading";
 
 export interface SearchDataResponse extends AnimationResponse {
@@ -34,7 +34,7 @@ interface Data {
   type: number;
 }
 
-interface Body {
+export interface Body {
   "keyword": string,
   "sort": string,
   "filter": FilterInterface
@@ -61,26 +61,6 @@ struct SearchPage {
   @State searchLimit: number = 20
   @State searchOffset: number = 0
   @State userInfo: string = ''
-
-  BuildBody(data: string) {
-    const body: Body = {
-      "keyword": `${data}`,
-      // 先默认为heat
-      "sort": "heat",
-      "filter": {
-        "type": [
-          2
-        ],
-        "tag": [],
-        "rank": [
-          ">=0",
-          "<=99999"
-        ],
-        "nsfw": false
-      }
-    }
-    return body
-  }
 
   @Builder
   SortWay() {
@@ -132,18 +112,11 @@ struct SearchPage {
               this.userInfo = data
               console.info("用户输入：" + data)
               // 发送Search请求
-              getAnimationItemBySearch(this.BuildBody(this.userInfo), this.searchLimit, this.searchOffset)
+              getAnimationItemBySearch(BuildBody(this.userInfo, "heat", [], 0), this.searchLimit, this.searchOffset)
                 .then((res) => {
                   // 再次请求时，初始化
                   this.animations = []
-                  res.data.forEach(item => {
-                    const animation: AnimationItem = {
-                      id: item.id,
-                      title: item.name_cn ? item.name_cn : item.name,
-                      image: item.image
-                    }
-                    this.animations.push(animation)
-                  })
+                  this.animations = transformSearchDataResponseToAnimations(res, this.animations)
                 })
               this.isLoading = false
             })
@@ -156,23 +129,16 @@ struct SearchPage {
           } else {
             Scroll() {
               GridRow({ columns: { sm: 3, md: 3, lg: 3 }, gutter: { x: 2, y: 4 } }) {
-                ForEach(this.animations, (animation: AnimationItem, index: number) => {
+                ForEach(this.animations, (animation: AnimationItem) => {
                   AnimationUnitSkeleton({ animationItem: animation })
                 })
               }
             }.onScrollEdge((side) => {
               if (side === Edge.Bottom) {
                 // 继续加载
-                getAnimationItemBySearch(this.BuildBody(this.userInfo), this.searchLimit,
+                getAnimationItemBySearch(BuildBody(this.userInfo, "heat", [], 0), this.searchLimit,
                   this.searchOffset += 20).then(res => {
-                  res.data.forEach(item => {
-                    const animation: AnimationItem = {
-                      id: item.id,
-                      title: item.name_cn ? item.name_cn : item.name,
-                      image: item.image
-                    }
-                    this.animations.push(animation)
-                  })
+                  this.animations = transformSearchDataResponseToAnimations(res, this.animations)
                 })
               }
             })
