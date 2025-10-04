@@ -45,6 +45,7 @@
 - [触底加载](#触底加载)
 - [Grid布局](#Grid布局)
 - [Navigation页面跳转](#Navigation页面跳转)
+- [内嵌页面](#内嵌页面)
 
 ---
 
@@ -468,3 +469,66 @@ struct Index {
 ```
 
 OK，以上就完成了路由跳转。
+
+
+
+---
+
+
+
+### 内嵌页面
+
+> 由于模拟器没有内置浏览器，因此这里采用内嵌页面去解决外部链接跳转技术。
+
+> 核心代码，指定URL以及Controller即可。
+
+```ts
+Web({ src: this.url, controller: this.webController }){
+    // ...
+}
+```
+
+
+
+> 实际应用：记得写`Loading`页面 [Loading页面](#Loading页面)
+
+```ts
+import { Loading } from './Loading';
+import { webview } from '@kit.ArkWeb';
+
+@Component
+export struct WebComponent {
+  private webController: WebviewController = new webview.WebviewController();
+  @Prop url: string;
+  @StorageLink('topHeight') topHeight: number = 0;
+  @State isLoading: boolean = true;
+
+  build() {
+    Column() {
+      Web({ src: this.url, controller: this.webController })
+        .javaScriptAccess(true)
+        .onPageBegin(() => {
+          this.isLoading = true;
+        })
+        .onPageEnd(() => {
+          this.isLoading = false;
+        })
+        .onErrorReceive((event) => {
+          console.error("网页加载出错:", event);
+          this.isLoading = false;
+        })
+
+      if (this.isLoading) {
+        Loading()
+          .position({ x: 0, y: 0 })
+          .width('100%')
+          .height('100%')
+          .zIndex(1000)
+      }
+    }
+    .width('100%')
+    .height('100%')
+  }
+}
+```
+
