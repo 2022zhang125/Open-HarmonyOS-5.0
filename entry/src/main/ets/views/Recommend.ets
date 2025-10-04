@@ -63,27 +63,27 @@ export struct Recommend {
         Tabs({ barPosition: BarPosition.Start, index: this.topIndex }) {
           ForEach(this.topNameList, (item: string, index) => {
             TabContent() {
-              // 默认状态
-              if (this.topIndex === index) {
-                GeneralContent({ title: item, index: this.topIndex })
-              } else {
-                Column() {
-                  Image($r('app.media.top'))
-                    .width(60)
-                    .height(60)
-                    .backgroundColor("#AEF2AF")
-                    .zIndex(2)
-                    .padding(15)
-                    .borderRadius(20)
-                    .position({ x: '80%', y: '72%' })
-                    .onClick(() => {
-                      this.scroll
-                        .scrollTo({
-                          xOffset: 0, yOffset: 0, animation: {
-                            duration: 300
-                          }
-                        })
-                    })
+              Column() {
+                Image($r('app.media.top'))
+                  .width(60)
+                  .height(60)
+                  .backgroundColor("#AEF2AF")
+                  .zIndex(2)
+                  .padding(15)
+                  .borderRadius(20)
+                  .position({ x: '80%', y: '72%' })
+                  .onClick(() => {
+                    this.scroll
+                      .scrollTo({
+                        xOffset: 0, yOffset: 0, animation: {
+                          duration: 300
+                        }
+                      })
+                  })
+                // 默认状态
+                if (this.topIndex === index) {
+                  GeneralContent({ title: item, index: this.topIndex, scroll: this.scroll })
+                } else {
                   DefaultContent({ scroll: this.scroll })
                 }
               }

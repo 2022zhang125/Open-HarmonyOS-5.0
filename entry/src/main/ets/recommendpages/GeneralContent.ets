@@ -14,6 +14,7 @@ export struct GeneralContent {
   @Prop index: number;
   @State isLoading: boolean = true
   @State animations: AnimationItem[] = []
+  scroll: Scroller = new Scroller()
 
   loadData() {
     // 构建Body
@@ -34,7 +35,7 @@ export struct GeneralContent {
       Loading()
     } else {
       // 展示页面
-      Scroll() {
+      Scroll(this.scroll) {
         GridRow({ columns: { sm: 3, md: 3, lg: 3 }, gutter: { x: 2, y: 4 } }) {
           ForEach(this.animations, (animation: AnimationItem) => {
             AnimationUnitSkeleton({ animationItem: animation })
