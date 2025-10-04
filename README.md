@@ -191,6 +191,34 @@ export async function HttpRequestGet(type: number, limit: number, offset: number
 
 
 
+#### 发送请求（POST请求）
+
+> 注意：POST请求请求体内数据要转JSON存入 `extraData` 中即可。
+
+```ts
+/**
+ * POST请求
+ * @param url POST请求地址
+ * @param requestData 请求体数据
+ * @returns 通常HttpResponse对象
+ */
+function postRequest(url: string, requestData: object): Promise<http.HttpResponse> {
+  const httpRequest = http.createHttp()
+  return httpRequest.request(url, {
+    method: http.RequestMethod.POST,
+    readTimeout: 5000,
+    header: {
+      'Content-Type': 'application/json'
+    },
+    connectTimeout: 3000,
+    // 转为JSON
+    extraData: JSON.stringify(requestData)
+  })
+}
+```
+
+
+
 #### 第二步：解析数据
 
 > 对解析数据时返回的对象进行限制
