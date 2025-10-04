@@ -23,6 +23,14 @@ export struct AnimationUnitSkeleton {
     GridCol({ span: 1 }) {
       Column() {
         Stack() {
+          // 默认图片 - 始终显示作为背景
+          Image(this.defaultImage)
+            .width('100%')
+            .height(180)
+            .borderRadius(15)
+            .objectFit(ImageFit.Cover)
+            .visibility(this.imageLoaded && !this.imageError ? Visibility.Hidden : Visibility.Visible)
+
           Image(this.animationItem.image != "" ? this.animationItem.image : this.defaultImage)
             .width('100%')
             .height(180)
